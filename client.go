@@ -23,7 +23,7 @@ func main() {
 
 	bb, _, err := reader.ReadLine()
 
-	fmt.Println("AUTH " + string(bb))
+	fmt.Println("AUTH response:" + string(bb))
 
 	go hb(conn)
 
@@ -44,7 +44,7 @@ func hb(conn net.Conn) {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+		fmt.Fprintf(os.Stderr, "error: %s", err.Error())
 		os.Exit(1)
 	}
 }
