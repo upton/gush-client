@@ -25,6 +25,8 @@ func main() {
 
 	fmt.Println("AUTH response:" + string(bb))
 
+	//conn.Close()
+
 	go hb(conn)
 
 	for {
@@ -36,6 +38,7 @@ func main() {
 }
 
 func hb(conn net.Conn) {
+
 	for {
 		conn.Write([]byte(HB))
 		time.Sleep(2 * time.Second)
