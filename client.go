@@ -4,7 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"net"
-	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -12,42 +13,61 @@ const (
 	AUTH       = "_A:"
 	HB         = "_H:"
 	MSG_PREFIX = "_M:"
+	NEW_LINE   = "\n"
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "127.0.0.1:8888")
-	checkError(err)
+	for i := 0; i < 5; i++ {
+		go run(strconv.Itoa(i))
+	}
+	time.Sleep(24 * time.Hour)
+}
 
-	conn.Write([]byte(AUTH + "upton"))
+func run(uid string) {
+	conn, err := net.Dial("tcp", "127.0.0.1:8888")
+	if err != nil {
+		fmt.Println("dial error:", err.Error())
+	}
+
+	conn.Write([]byte(AUTH + uid))
 	reader := bufio.NewReader(conn)
 
 	bb, _, err := reader.ReadLine()
 
 	fmt.Println("AUTH response:" + string(bb))
 
-	//conn.Close()
-
 	go hb(conn)
 
 	for {
 		bb, _, err := reader.ReadLine()
-		checkError(err)
+		if err != nil {
+			fmt.Println("read error:", err.Error())
+			break
+		} else {
 
-		fmt.Println("Server response:[" + string(bb) + "]")
+			respStr := string(bb)
+			if !strings.HasPrefix(respStr, HB) {
+				fmt.Println("Server response:[" + respStr + "][" + uid + "]")
+				if strings.HasPrefix(respStr, MSG_PREFIX) {
+					_, err := conn.Write([]byte(MSG_PREFIX + "OK" + NEW_LINE))
+					if err != nil {
+						fmt.Println("write error:", err.Error())
+						break
+					}
+				}
+			}
+		}
 	}
 }
 
 func hb(conn net.Conn) {
-
 	for {
-		conn.Write([]byte(HB))
-		time.Sleep(2 * time.Second)
-	}
-}
+		_, err := conn.Write([]byte(HB + NEW_LINE))
+		if err != nil {
+			fmt.Println("write error:", err.Error())
+			break
+		}
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s", err.Error())
-		os.Exit(1)
+		time.Sleep(2 * time.Second)
 	}
 }
