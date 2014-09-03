@@ -17,7 +17,8 @@ const (
 )
 
 func main() {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 2000; i++ {
+		time.Sleep(10 * time.Millisecond)
 		go run(strconv.Itoa(i))
 	}
 	time.Sleep(24 * time.Hour)
