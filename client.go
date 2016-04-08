@@ -17,7 +17,7 @@ const (
 )
 
 func main() {
-	for i := 0; i < 2000; i++ {
+	for i := 0; i < 3000; i++ {
 		time.Sleep(10 * time.Millisecond)
 		go run(strconv.Itoa(i))
 	}
@@ -69,6 +69,6 @@ func hb(conn net.Conn) {
 			break
 		}
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(6 * time.Second)
 	}
 }
